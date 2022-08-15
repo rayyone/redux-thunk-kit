@@ -1,21 +1,23 @@
 {
-  "name": "redux-thunkit",
+  "name": "redux-thunk-kit",
   "description": "This library provide a way to work with normalized data using redux toolkit ",
   "version": "0.0.1",
   "author": "Rayyone Ltd.",
   "keywords": [
     "rayyone",
     "redux toolkit",
+    "normalizr",
+    "normalized data",
     "redux",
     "reselect",
-    "redux thunkit",
+    "redux thunk kit",
     "react",
     "react js",
     "react native"
   ],
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/rayyone/redux-thunkit",
+    "url": "git+https://github.com/rayyone/redux-thunkit.git",
     "type": "git"
   },
   "engines": {
@@ -30,8 +32,7 @@
   "scripts": {
     "build": "tsc",
     "prettier:write": "npx prettier --write **/*.{js,ts,tsx}",
-    "lint": "eslint ./src --ext .js,.jsx --fix",
-    "prepublish": "tsc"
+    "lint": "eslint ./src --ext .js,.jsx --fix"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.4",
@@ -50,5 +51,12 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "normalizr": "^3.6.1",
     "prettier": "^2.4.1"
+  },
+  "bugs": {
+    "url": "https://github.com/rayyone/redux-thunkit/issues"
+  },
+  "homepage": "https://github.com/rayyone/redux-thunkit#readme",
+  "publishConfig": {
+    "access": "public"
   }
 }
