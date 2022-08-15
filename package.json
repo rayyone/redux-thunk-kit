@@ -1,0 +1,54 @@
+{
+  "name": "redux-thunkit",
+  "description": "This library provide a way to work with normalized data using redux toolkit ",
+  "version": "0.0.1",
+  "author": "Rayyone Ltd.",
+  "keywords": [
+    "rayyone",
+    "redux toolkit",
+    "redux",
+    "reselect",
+    "redux thunkit",
+    "react",
+    "react js",
+    "react native"
+  ],
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/rayyone/redux-thunkit",
+    "type": "git"
+  },
+  "engines": {
+    "node": "12 || 14 || 16 || 17"
+  },
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prettier:write": "npx prettier --write **/*.{js,ts,tsx}",
+    "lint": "eslint ./src --ext .js,.jsx --fix",
+    "prepublish": "tsc"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.8.4",
+    "lodash": "^4.17.21",
+    "typescript": "^4.1.2"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.15.0",
+    "@types/axios": "^0.14.0",
+    "@types/lodash": "^4.14.176",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "eslint-config-airbnb-typescript": "^14.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "normalizr": "^3.6.1",
+    "prettier": "^2.4.1"
+  }
+}
