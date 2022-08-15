@@ -17,7 +17,7 @@
   ],
   "license": "MIT",
   "repository": {
-    "url": "git+https://github.com/rayyone/redux-thunkit.git",
+    "url": "git+https://github.com/rayyone/redux-thunk-kit.git",
     "type": "git"
   },
   "engines": {
@@ -53,9 +53,9 @@
     "prettier": "^2.4.1"
   },
   "bugs": {
-    "url": "https://github.com/rayyone/redux-thunkit/issues"
+    "url": "https://github.com/rayyone/redux-thunk-kit/issues"
   },
-  "homepage": "https://github.com/rayyone/redux-thunkit#readme",
+  "homepage": "https://github.com/rayyone/redux-thunk-kit#readme",
   "publishConfig": {
     "access": "public"
   }
