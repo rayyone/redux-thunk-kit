@@ -1,9 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {normalize, Schema} from 'normalizr';
 import {isArray, isBoolean, isEmpty, omit} from 'lodash';
-import {parseFormDataToObj, serializeQueryString, snakeCaseObj, requestDummyData} from './helpers';
+import {parseFormDataToObj, requestDummyData, serializeQueryString, snakeCaseObj} from './helpers';
 import {
+  ActionOption,
   ApiResponse,
+  ApiService,
   AxiosResult,
   BaseRequest,
   Callbacks,
@@ -12,60 +14,88 @@ import {
   NormalizedPayload,
   PostParams,
   PutParams,
+  QueryOption,
   RejectErrorValue,
-  ActionOption,
+  RequestHelperConfig,
+  ThunkKitConfig,
   ThunkRawResult,
   ThunkResult,
-  ThunkApiConfig,
-  ApiService,
-  ThunkOption,
 } from './type';
+import {AsyncThunk} from '@reduxjs/toolkit/src/createAsyncThunk';
 
-let dummyData: Record<string, any> = {}
-let AppError: any = undefined
-let rootStore: any = undefined
-let rootReducer: any = undefined
-const apiServices: Record<string, ApiService> = {};
-let defaultService: ApiService = {} as ApiService;
+export class ThunkKit {
+  apiServices: Record<string, ApiService> = {};
+  defaultService: ApiService = {} as ApiService;
+  dummyData?: Record<string, any>;
+  ErrorHandler?: any;
 
-type RootState = ReturnType<typeof rootReducer>
-type AppDispatch = typeof rootStore.dispatch;
-
-export function setup(thunkApiConfig: ThunkApiConfig) {
-  let isSetDefaultService = false;
-  const thunkServices = [...thunkApiConfig.apiServices];
-  if (thunkServices.length === 1) {
-    thunkServices[0].isDefault = true;
+  constructor(config: ThunkKitConfig) {
+    this.setDummyData(config);
+    this.setErrorHandler(config);
+    this.setApiServices(config);
   }
-  thunkServices.forEach((as: ApiService) => {
-    apiServices[as.name] = as;
-    if (as.isDefault) {
-      defaultService = as;
-      isSetDefaultService = true;
+
+  query<ApiItem = undefined, NormalizedResult = undefined>(
+    namespace: string,
+    entitySchema: Schema | undefined = undefined,
+    option: QueryOption = {},
+  ) {
+    const config = {
+      apiServices: this.apiServices,
+      defaultService: this.defaultService,
+      dummyData: this.dummyData,
+      ErrorHandler: this.ErrorHandler,
+    };
+    return new QueryHelper<ApiItem, NormalizedResult>(namespace, entitySchema, option, config);
+  }
+
+  setDummyData(config: ThunkKitConfig) {
+    this.dummyData = config.dummyData || {};
+  }
+
+  setErrorHandler(config: ThunkKitConfig) {
+    this.ErrorHandler = config.errorHandler;
+  }
+
+  setApiServices(config: ThunkKitConfig) {
+    let hasDefaultService = false;
+    const thunkServices = [...config.apiServices];
+    if (thunkServices.length === 1) {
+      thunkServices[0].isDefault = true;
     }
-  });
-  if (!isSetDefaultService) {
-    throw new Error('You need to have at least 1 default API Service');
+    thunkServices.forEach((as: ApiService) => {
+      this.apiServices[as.name] = as;
+      if (as.isDefault) {
+        this.defaultService = as;
+        hasDefaultService = true;
+      }
+    });
+    if (!hasDefaultService) {
+      throw new Error('You need to have at least 1 default API Service');
+    }
   }
-  dummyData = thunkApiConfig.dummyData || {}
-  AppError = thunkApiConfig.errorHandler
-  rootStore = thunkApiConfig.rootStore
-  rootReducer = thunkApiConfig.rootReducer
-
 }
 
-export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
+class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
   namespace: string;
 
   entitySchema?: Schema;
 
-  thunkOption: ThunkOption;
+  queryOption: QueryOption;
 
-  constructor(namespace: string, entitySchema: Schema | undefined = undefined, option: ThunkOption = {}) {
+  config: RequestHelperConfig = {} as RequestHelperConfig;
+
+  constructor(
+    namespace: string,
+    entitySchema: Schema | undefined = undefined,
+    option: QueryOption = {},
+    config: RequestHelperConfig = {} as RequestHelperConfig,
+  ) {
     this.namespace = namespace;
     this.entitySchema = entitySchema;
 
-    this.thunkOption = {...option};
+    this.queryOption = {...option};
+    this.config = config;
   }
 
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
@@ -304,35 +334,33 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
       callbacks,
     );
 
-  misc = <P, Return = any>(
+  wrapper = <P, Return = any>(
     prefix: string,
-    cb: (arg1: P, dispatch: AppDispatch, onError: (e?: typeof AppError | Error) => any, getState: any) => Promise<Return>,
-  ): ThunkRawResult<Return, P> =>
-    createAsyncThunk<Return, P, {dispatch: AppDispatch}>(
-      `${this.namespace}/MISC/${prefix}`,
-      async (params, {dispatch, rejectWithValue, getState}) => {
-        const onError = (appErr?: typeof AppError | any) => {
-          if (!appErr) {
-            return rejectWithValue({});
-          }
-          if (!(appErr instanceof AppError)) {
-            appErr = new AppError(appErr);
-          }
-          return rejectWithValue({
-            errCode: appErr.customErrCode,
-            errStatusCode: appErr.statusCode,
-            messageBag: appErr.messageBag,
-            contexts: appErr.contexts,
-            errMsg: appErr.userMsg
-          } as RejectErrorValue);
-        };
-        try {
-          return await cb(params, dispatch, onError, getState);
-        } catch (e) {
-          return onError(e);
+    cb: (p: P, thunkAPI: {dispatch: any; getState: any; requestId: string; rejectWithValue: any}) => any,
+    options?: ActionOption,
+  ): AsyncThunk<Return, P, {}> =>
+    createAsyncThunk<Return, P>(`${this.namespace}/WRAP/${prefix}`, async (params, thunkAPI) => {
+      const onError = (error?: typeof this.config.ErrorHandler | any) => {
+        if (!error) {
+          return thunkAPI.rejectWithValue({});
         }
-      },
-    );
+        if (!(error instanceof this.config.ErrorHandler)) {
+          error = new this.config.ErrorHandler(error);
+        }
+        return thunkAPI.rejectWithValue({
+          errCode: error.customErrCode,
+          errStatusCode: error.statusCode,
+          messageBag: error.messageBag,
+          contexts: error.contexts,
+          errMsg: error.userMsg,
+        } as RejectErrorValue);
+      };
+      try {
+        return await cb(params, {...thunkAPI});
+      } catch (e) {
+        return onError(e);
+      }
+    });
 
   private fetchRequest<Params extends FetchParams, ApiResponseData>(
     endpoint: string,
@@ -386,7 +414,7 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
     return createAsyncThunk<
       NormalizedPayload<NormalizedResult>,
       Params,
-      {rejectValue: RejectErrorValue, dispatch: any}
+      {rejectValue: RejectErrorValue; dispatch: any}
     >(`${this.namespace}/${prefix}`, async (params: Params, {rejectWithValue, getState}) => {
       const {source, data: requestData} = params;
       try {
@@ -414,19 +442,15 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
           payload.response = omit(responseBody?.data, 'data');
         }
 
-        // if (callbacks?.onSuccess) {
-        //   await callbacks?.onSuccess({responseBody, returnPayload: payload, params, dispatch, getState});
-        // }
-
         return payload;
       } catch (e) {
-        const appErr = new AppError(e);
+        const appErr = new this.config.ErrorHandler(e);
         return rejectWithValue({
           errCode: appErr.customErrCode,
           errStatusCode: appErr.statusCode,
           contexts: appErr.contexts,
           messageBag: appErr.messageBag,
-          errMsg: appErr.userMsg
+          errMsg: appErr.userMsg,
         } as RejectErrorValue);
       }
     });
@@ -444,21 +468,19 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
         try {
           const responseBody = await this.makeRequest<Params, ApiResponseData>(endpoint, params, options);
           const apiResponseData = (responseBody?.data?.data || {}) as ApiResponseData;
-          // if (callbacks?.onSuccess) {
-          //   await callbacks?.onSuccess({responseBody, params, dispatch, getState});
-          // }
+
           if (options?.fullResponse) {
             return responseBody?.data;
           }
           return apiResponseData;
         } catch (e) {
-          const appErr = new AppError(e);
+          const appErr = new this.config.ErrorHandler(e);
           return rejectWithValue({
             errCode: appErr.customErrCode,
             errStatusCode: appErr.statusCode,
             messageBag: appErr.messageBag,
             contexts: appErr.contexts,
-            errMsg: appErr.userMsg
+            errMsg: appErr.userMsg,
           } as RejectErrorValue);
         }
       },
@@ -471,11 +493,7 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
     callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
     return async (params: Params) => {
-      const responseBody = await this.makeRequest<Params, ApiResponseData>(endpoint, params, options);
-      // if (callbacks?.onSuccess) {
-      //   await callbacks?.onSuccess({responseBody, params});
-      // }
-      return responseBody;
+      return await this.makeRequest<Params, ApiResponseData>(endpoint, params, options);
     };
   }
 
@@ -488,18 +506,18 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
     const {data: dataParam, ...urlParams} = params;
     let data = {...dataParam, ...options?.fixedData};
 
-    let apiService = defaultService;
+    let apiService = this.config.defaultService;
     if (options?.service) {
-      apiService = apiServices[options.service];
-    } else if (this.thunkOption.service) {
-      apiService = apiServices[this.thunkOption.service];
+      apiService = this.config.apiServices[options.service];
+    } else if (this.queryOption.service) {
+      apiService = this.config.apiServices[this.queryOption.service];
     }
     const request = apiService.axios;
     let shouldUseSnakeCase = apiService.isSnakeCase;
     if (isBoolean(options?.isSnakeCase)) {
       shouldUseSnakeCase = options?.isSnakeCase;
-    } else if (isBoolean(this.thunkOption.isSnakeCase)) {
-      shouldUseSnakeCase = this.thunkOption.isSnakeCase;
+    } else if (isBoolean(this.queryOption.isSnakeCase)) {
+      shouldUseSnakeCase = this.queryOption.isSnakeCase;
     }
 
     if (!isEmpty(data)) {
@@ -511,7 +529,11 @@ export class ThunkApi<ApiItem = undefined, NormalizedResult = undefined> {
     }
     const url = getFullUrl(endpoint, {...urlParams, ...options?.fixedParams}, shouldUseSnakeCase);
     if (options?.dummyData) {
-      return (await requestDummyData(options?.restfulMethod || 'get', url, dummyData)) as ApiResponse<ApiResponseData>;
+      return (await requestDummyData(
+        options?.restfulMethod || 'get',
+        url,
+        this.config.dummyData,
+      )) as ApiResponse<ApiResponseData>;
     }
     if (options?.restfulMethod === 'put' || options?.restfulMethod === 'post') {
       const requestApi = options?.restfulMethod === 'put' ? request.put : request.post;

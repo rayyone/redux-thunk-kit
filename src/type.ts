@@ -1,26 +1,8 @@
 import {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
-import {AnyAction, AsyncThunk, Dispatch, EnhancedStore, ThunkDispatch} from '@reduxjs/toolkit';
+import {AsyncThunk, Dispatch} from '@reduxjs/toolkit';
 import {NormalizedSchema} from 'normalizr';
 
-export interface OnSuccess<ResponseBody, Return, Params, RootState = any> {
-  ({
-    responseBody,
-    returnPayload,
-    params,
-    dispatch,
-    getState,
-  }: {
-    responseBody?: ResponseBody;
-    returnPayload?: Return;
-    params?: Params;
-    dispatch?: EnhancedStore["dispatch"];
-    getState?: () => RootState;
-  }): any;
-}
-
-export interface Callbacks<ResponseBody, Return, Params> {
-  // onSuccess: OnSuccess<ResponseBody, Return, Params>; Removed this since we already have thunk.misc()
-}
+export interface Callbacks<ResponseBody, Return, Params> {}
 
 export interface SourceReducerState {
   allIds?: any[];
@@ -148,15 +130,20 @@ export interface ApiService {
   isSnakeCase?: boolean;
 }
 
-export interface ThunkApiConfig {
-  rootStore: any;
-  rootReducer: any;
+export interface ThunkKitConfig {
   apiServices: ApiService[];
   dummyData?: Record<string, any>;
   errorHandler?: any;
 }
 
-export interface ThunkOption {
+export interface QueryOption {
   isSnakeCase?: boolean;
   service?: string;
+}
+
+export interface RequestHelperConfig {
+  ErrorHandler: any;
+  apiServices: Record<string, ApiService>;
+  defaultService: ApiService;
+  dummyData: Record<string, any> | undefined;
 }
