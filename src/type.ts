@@ -62,8 +62,10 @@ export interface RequestState {
 
 export interface BaseRequest {
   source?: string;
-
-  [key: string]: any;
+  data?: any;
+  isLoadMore?: boolean;
+  // Do Not allow dynamic key! Don't uncomment below line
+  // [key: string]: any;
 }
 
 export interface PostParams extends BaseRequest {

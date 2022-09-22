@@ -1,7 +1,7 @@
 {
   "name": "redux-thunk-kit",
   "description": "This library provide a way to work with normalized data using redux toolkit ",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Rayyone Ltd.",
   "keywords": [
     "rayyone",
@@ -31,7 +31,8 @@
   "scripts": {
     "build": "tsc",
     "prettier:write": "npx prettier --write **/*.{js,ts,tsx}",
-    "lint": "eslint ./src --ext .js,.jsx --fix"
+    "lint": "eslint ./src --ext .js,.jsx --fix",
+    "prepare" : "yarn run build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.4",
@@ -42,14 +43,12 @@
   "devDependencies": {
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.15.0",
-    "@types/axios": "^0.14.0",
     "@types/lodash": "^4.14.176",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "eslint-config-airbnb-typescript": "^14.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
     "normalizr": "^3.6.1",
     "prettier": "^2.4.1"
   },

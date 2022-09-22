@@ -566,6 +566,7 @@ const getFullUrl = (endpoint: string, params: FetchParams, isUseSnakeCase?: bool
   const {source, ...rest} = params;
   let url = endpoint;
   getUrlParamKeys(url).forEach(urlParamKey => {
+    // @ts-ignore
     url = url.replace(`:${urlParamKey}`, params[urlParamKey]);
   });
 
