@@ -97,7 +97,6 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     this.queryOption = {...option};
     this.config = config;
   }
-
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
@@ -341,8 +340,7 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
   ): AsyncThunk<Return, P, {}> =>
     createAsyncThunk<Return, P>(`${this.namespace}/WRAP/${prefix}`, async (params, thunkAPI) => {
       const onError = (error?: typeof this.config.ErrorHandler | any) => {
-        if(!this.config.ErrorHandler) return
-        if (!error) {
+        if (!error || this.queryOption?.isIgnoreError || options?.isIgnoreError) {
           return thunkAPI.rejectWithValue({});
         }
         if (!(error instanceof this.config.ErrorHandler)) {
@@ -445,19 +443,18 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
 
         return payload;
       } catch (e) {
-          const appErr = new this.config.ErrorHandler(e);
-          if(appErr){
-            return rejectWithValue({
-              errCode: appErr.customErrCode,
-              errStatusCode: appErr.statusCode,
-              contexts: appErr.contexts,
-              messageBag: appErr.messageBag,
-              errMsg: appErr.userMsg,
-            } as RejectErrorValue);
-          }else {
-            throw new Error('')
-          }
+        const appErr = new this.config.ErrorHandler(e);
+        if(this.queryOption?.isIgnoreError || options?.isIgnoreError){
+          return rejectWithValue({} as RejectErrorValue);
         }
+        return rejectWithValue({
+          errCode: appErr.customErrCode,
+          errStatusCode: appErr.statusCode,
+          contexts: appErr.contexts,
+          messageBag: appErr.messageBag,
+          errMsg: appErr.userMsg,
+        } as RejectErrorValue);
+      }
     });
   }
 
@@ -479,18 +476,17 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
           }
           return apiResponseData;
         } catch (e) {
-            const appErr = new this.config.ErrorHandler(e);
-            if(appErr) {
-              return rejectWithValue({
-                errCode: appErr.customErrCode,
-                errStatusCode: appErr.statusCode,
-                messageBag: appErr.messageBag,
-                contexts: appErr.contexts,
-                errMsg: appErr.userMsg,
-              } as RejectErrorValue);
-            }else {
-              throw new Error('')
-            }
+          const appErr = new this.config.ErrorHandler(e);
+          if(this.queryOption?.isIgnoreError || options?.isIgnoreError){
+            return rejectWithValue({} as RejectErrorValue);
+          }
+          return rejectWithValue({
+            errCode: appErr.customErrCode,
+            errStatusCode: appErr.statusCode,
+            messageBag: appErr.messageBag,
+            contexts: appErr.contexts,
+            errMsg: appErr.userMsg,
+          } as RejectErrorValue);
         }
       },
     );
