@@ -27,6 +27,7 @@ export interface ActionOption {
   isCallApiOnly?: boolean;
   withoutNormalize?: boolean;
   isSnakeCase?: boolean;
+  isIgnoreError?: boolean;
   urlPlaceholders?: string[];
   includeApiResponseData?: boolean;
   restfulMethod?: 'post' | 'put' | 'delete' | 'get';
@@ -140,6 +141,7 @@ export interface ThunkKitConfig {
 
 export interface QueryOption {
   isSnakeCase?: boolean;
+  isIgnoreError?: boolean;
   service?: string;
 }
 

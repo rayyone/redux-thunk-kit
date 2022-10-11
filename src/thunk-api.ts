@@ -44,7 +44,7 @@ export class ThunkKit {
       apiServices: this.apiServices,
       defaultService: this.defaultService,
       dummyData: this.dummyData,
-      ErrorHandler: this.ErrorHandler,
+      ErrorHandler: option?.isIgnoreError ? undefined : this.ErrorHandler,
     };
     return new QueryHelper<ApiItem, NormalizedResult>(namespace, entitySchema, option, config);
   }
@@ -341,6 +341,7 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
   ): AsyncThunk<Return, P, {}> =>
     createAsyncThunk<Return, P>(`${this.namespace}/WRAP/${prefix}`, async (params, thunkAPI) => {
       const onError = (error?: typeof this.config.ErrorHandler | any) => {
+        if(!this.config.ErrorHandler) return
         if (!error) {
           return thunkAPI.rejectWithValue({});
         }
@@ -444,15 +445,19 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
 
         return payload;
       } catch (e) {
-        const appErr = new this.config.ErrorHandler(e);
-        return rejectWithValue({
-          errCode: appErr.customErrCode,
-          errStatusCode: appErr.statusCode,
-          contexts: appErr.contexts,
-          messageBag: appErr.messageBag,
-          errMsg: appErr.userMsg,
-        } as RejectErrorValue);
-      }
+          const appErr = new this.config.ErrorHandler(e);
+          if(appErr){
+            return rejectWithValue({
+              errCode: appErr.customErrCode,
+              errStatusCode: appErr.statusCode,
+              contexts: appErr.contexts,
+              messageBag: appErr.messageBag,
+              errMsg: appErr.userMsg,
+            } as RejectErrorValue);
+          }else {
+            throw new Error('')
+          }
+        }
     });
   }
 
@@ -474,14 +479,18 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
           }
           return apiResponseData;
         } catch (e) {
-          const appErr = new this.config.ErrorHandler(e);
-          return rejectWithValue({
-            errCode: appErr.customErrCode,
-            errStatusCode: appErr.statusCode,
-            messageBag: appErr.messageBag,
-            contexts: appErr.contexts,
-            errMsg: appErr.userMsg,
-          } as RejectErrorValue);
+            const appErr = new this.config.ErrorHandler(e);
+            if(appErr) {
+              return rejectWithValue({
+                errCode: appErr.customErrCode,
+                errStatusCode: appErr.statusCode,
+                messageBag: appErr.messageBag,
+                contexts: appErr.contexts,
+                errMsg: appErr.userMsg,
+              } as RejectErrorValue);
+            }else {
+              throw new Error('')
+            }
         }
       },
     );
@@ -518,6 +527,9 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
       shouldUseSnakeCase = options?.isSnakeCase;
     } else if (isBoolean(this.queryOption.isSnakeCase)) {
       shouldUseSnakeCase = this.queryOption.isSnakeCase;
+    }
+    if(options?.isIgnoreError) {
+      this.config.ErrorHandler = undefined
     }
 
     if (!isEmpty(data)) {
