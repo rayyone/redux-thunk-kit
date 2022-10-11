@@ -44,7 +44,7 @@ export class ThunkKit {
       apiServices: this.apiServices,
       defaultService: this.defaultService,
       dummyData: this.dummyData,
-      ErrorHandler: option?.isIgnoreError ? undefined : this.ErrorHandler,
+      ErrorHandler: this.ErrorHandler,
     };
     return new QueryHelper<ApiItem, NormalizedResult>(namespace, entitySchema, option, config);
   }
@@ -97,6 +97,7 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     this.queryOption = {...option};
     this.config = config;
   }
+
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
@@ -523,9 +524,6 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
       shouldUseSnakeCase = options?.isSnakeCase;
     } else if (isBoolean(this.queryOption.isSnakeCase)) {
       shouldUseSnakeCase = this.queryOption.isSnakeCase;
-    }
-    if(options?.isIgnoreError) {
-      this.config.ErrorHandler = undefined
     }
 
     if (!isEmpty(data)) {
