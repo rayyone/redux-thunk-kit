@@ -8,7 +8,6 @@ import {
   ApiService,
   AxiosResult,
   BaseRequest,
-  Callbacks,
   DeleteParams,
   FetchParams,
   NormalizedPayload,
@@ -102,237 +101,186 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     endpoint: string,
     prefix: string,
     options: ActionOption & {withoutNormalize: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkRawResult<ApiResponseData, Params>;
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {isCallApiOnly: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): AxiosResult<ApiResponseData, Params>;
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   fetchOne<Params extends FetchParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
-    return this.fetchRequest<Params, ApiResponseData>(
-      endpoint,
-      prefix ? `${prefix}/fetchOne` : 'fetchOne',
-      options,
-      callbacks,
-    );
+    return this.fetchRequest<Params, ApiResponseData>(endpoint, prefix ? `${prefix}/fetchOne` : 'fetchOne', options);
   }
 
   fetch<Params extends FetchParams, ApiResponseData = ApiItem[]>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {withoutNormalize: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkRawResult<ApiResponseData, Params>;
   fetch<Params extends FetchParams, ApiResponseData = ApiItem[]>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {isCallApiOnly: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): AxiosResult<ApiResponseData, Params>;
   fetch<Params extends FetchParams, ApiResponseData = ApiItem[]>(
     endpoint: string,
     prefix: string,
     options: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   fetch<Params extends FetchParams, ApiResponseData = ApiItem[]>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   fetch<Params extends FetchParams, ApiResponseData = ApiItem[]>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
-    return this.fetchRequest<Params, ApiResponseData>(
-      endpoint,
-      prefix ? `${prefix}/fetchMany` : 'fetchMany',
-      options,
-      callbacks,
-    );
+    return this.fetchRequest<Params, ApiResponseData>(endpoint, prefix ? `${prefix}/fetchMany` : 'fetchMany', options);
   }
 
   post<Params extends PostParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {withoutNormalize: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkRawResult<ApiResponseData, Params>;
   post<Params extends PostParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {isCallApiOnly: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): AxiosResult<ApiResponseData, Params>;
   post<Params extends PostParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   post<Params extends PostParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   post<Params extends PostParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
-    return this.postRequest<Params, ApiResponseData>(
-      endpoint,
-      prefix ? `${prefix}/post` : 'post',
-      {...options, restfulMethod: 'post'},
-      callbacks,
-    );
+    return this.postRequest<Params, ApiResponseData>(endpoint, prefix ? `${prefix}/post` : 'post', {
+      ...options,
+      restfulMethod: 'post',
+    });
   }
 
   put<Params extends PutParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {withoutNormalize: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkRawResult<ApiResponseData, Params>;
   put<Params extends PutParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {isCallApiOnly: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): AxiosResult<ApiResponseData, Params>;
   put<Params extends PutParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   put<Params extends PutParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   put<Params extends PutParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ):
     | ThunkResult<NormalizedResult, Params>
     | AxiosResult<ApiResponseData, Params>
     | ThunkRawResult<ApiResponseData, Params> {
-    return this.postRequest<Params, ApiResponseData>(
-      endpoint,
-      prefix ? `${prefix}/put` : 'put',
-      {...options, restfulMethod: 'put'},
-      callbacks,
-    );
+    return this.postRequest<Params, ApiResponseData>(endpoint, prefix ? `${prefix}/put` : 'put', {
+      ...options,
+      restfulMethod: 'put',
+    });
   }
 
   delete<Params extends DeleteParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {withoutNormalize: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkRawResult<ApiResponseData, Params>;
   delete<Params extends DeleteParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption & {isCallApiOnly: true},
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): AxiosResult<ApiResponseData, Params>;
   delete<Params extends DeleteParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix: string,
     options: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   delete<Params extends DeleteParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ): ThunkResult<NormalizedResult, Params>;
   delete<Params extends DeleteParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
     const deletePrefix = prefix ? `${this.namespace}/${prefix}/delete` : `${this.namespace}/delete`;
     if (options?.isCallApiOnly === true) {
-      return this.createApiRequestThunk<ApiResponseData, Params>(
-        endpoint,
-        {...options, restfulMethod: 'delete'},
-        callbacks,
-      );
+      return this.createApiRequestThunk<ApiResponseData, Params>(endpoint, {...options, restfulMethod: 'delete'});
     }
 
     if (options?.withoutNormalize === true) {
-      return this.createAsyncThunkWithoutNormalize<ApiResponseData, Params>(
-        deletePrefix,
-        endpoint,
-        {...options, restfulMethod: 'delete'},
-        callbacks,
-      );
+      return this.createAsyncThunkWithoutNormalize<ApiResponseData, Params>(deletePrefix, endpoint, {
+        ...options,
+        restfulMethod: 'delete',
+      });
     }
-    return this.createAsyncThunkAndNormalize<ApiResponseData, Params>(
-      deletePrefix,
-      endpoint,
-      {...options, restfulMethod: 'delete'},
-      callbacks,
-    );
+    return this.createAsyncThunkAndNormalize<ApiResponseData, Params>(deletePrefix, endpoint, {
+      ...options,
+      restfulMethod: 'delete',
+    });
   }
 
   postFormData = <Params extends PostParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) =>
-    this.post(
-      endpoint,
-      prefix,
-      {requestConfig: {headers: {'content-type': 'multipart/form-data'}}, ...options, restfulMethod: 'post'},
-      callbacks,
-    );
+    this.post(endpoint, prefix, {
+      requestConfig: {headers: {'content-type': 'multipart/form-data'}},
+      ...options,
+      restfulMethod: 'post',
+    });
 
   putFormData = <Params extends PutParams, ApiResponseData = ApiItem>(
     endpoint: string,
     prefix?: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) =>
-    this.put(
-      endpoint,
-      prefix,
-      {requestConfig: {headers: {'content-type': 'multipart/form-data'}}, ...options, restfulMethod: 'put'},
-      callbacks,
-    );
+    this.put(endpoint, prefix, {
+      requestConfig: {headers: {'content-type': 'multipart/form-data'}},
+      ...options,
+      restfulMethod: 'put',
+    });
 
   wrapper = <P, Return = any>(
     prefix: string,
@@ -366,47 +314,44 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     endpoint: string,
     prefix: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ):
     | ThunkResult<NormalizedResult, Params>
     | AxiosResult<ApiResponseData, Params>
     | ThunkRawResult<ApiResponseData, Params> {
     if (options?.isCallApiOnly === true) {
-      return this.createApiRequestThunk<ApiResponseData, Params>(endpoint, options, callbacks);
+      return this.createApiRequestThunk<ApiResponseData, Params>(endpoint, options);
     }
 
     if (options?.withoutNormalize === true) {
-      return this.createAsyncThunkWithoutNormalize<ApiResponseData, Params>(prefix, endpoint, options, callbacks);
+      return this.createAsyncThunkWithoutNormalize<ApiResponseData, Params>(prefix, endpoint, options);
     }
 
-    return this.createAsyncThunkAndNormalize<ApiResponseData, Params>(prefix, endpoint, options, callbacks);
+    return this.createAsyncThunkAndNormalize<ApiResponseData, Params>(prefix, endpoint, options);
   }
 
   private postRequest<Params, ApiResponseData>(
     endpoint: string,
     prefix: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ):
     | ThunkResult<NormalizedResult, Params>
     | AxiosResult<ApiResponseData, Params>
     | ThunkRawResult<ApiResponseData, Params> {
     if (options?.isCallApiOnly === true) {
-      return this.createApiRequestThunk<ApiResponseData, Params>(endpoint, options, callbacks);
+      return this.createApiRequestThunk<ApiResponseData, Params>(endpoint, options);
     }
 
     if (options?.withoutNormalize === true) {
-      return this.createAsyncThunkWithoutNormalize<ApiResponseData, Params>(prefix, endpoint, options, callbacks);
+      return this.createAsyncThunkWithoutNormalize<ApiResponseData, Params>(prefix, endpoint, options);
     }
 
-    return this.createAsyncThunkAndNormalize<ApiResponseData, Params>(prefix, endpoint, options, callbacks);
+    return this.createAsyncThunkAndNormalize<ApiResponseData, Params>(prefix, endpoint, options);
   }
 
   private createAsyncThunkAndNormalize<ApiResponseData, Params extends BaseRequest>(
     prefix: string,
     endpoint: string,
     options?: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
     if (this.entitySchema === undefined) {
       throw new Error('Normalize Error: Missing schemaEntity declaration. Locate at class constructor');
@@ -463,7 +408,6 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     prefix: string,
     endpoint: string,
     options: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
   ) {
     return createAsyncThunk<ApiResponseData | any, Params, {}>(
       `${this.namespace}/withoutNormalize/${prefix}`,
@@ -493,11 +437,7 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     );
   }
 
-  private createApiRequestThunk<ApiResponseData, Params>(
-    endpoint: string,
-    options: ActionOption,
-    callbacks?: Callbacks<ApiResponse<ApiResponseData>, NormalizedPayload<NormalizedResult>, Params>,
-  ) {
+  private createApiRequestThunk<ApiResponseData, Params>(endpoint: string, options: ActionOption) {
     return async (params: Params) => {
       return await this.makeRequest<Params, ApiResponseData>(endpoint, params, options);
     };
