@@ -2,8 +2,6 @@ import {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {AsyncThunk, Dispatch} from '@reduxjs/toolkit';
 import {NormalizedSchema} from 'normalizr';
 
-export interface Callbacks<ResponseBody, Return, Params> {}
-
 export interface SourceReducerState {
   allIds?: any[];
   paginator?: Paginator;
@@ -27,7 +25,6 @@ export interface ActionOption {
   isCallApiOnly?: boolean;
   withoutNormalize?: boolean;
   isSnakeCase?: boolean;
-  urlPlaceholders?: string[];
   includeApiResponseData?: boolean;
   restfulMethod?: 'post' | 'put' | 'delete' | 'get';
   dummyData?: boolean;
@@ -86,7 +83,6 @@ export interface FetchParams extends BaseRequest {
   page?: number;
   limit?: number;
   isLoadMore?: boolean;
-  urlPlaceholders?: string[];
 }
 
 export interface BasePayload {
