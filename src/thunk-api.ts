@@ -288,12 +288,14 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
     options?: ActionOption,
   ): AsyncThunk<Return, P, {}> =>
     createAsyncThunk<Return, P>(`${this.namespace}/WRAP/${prefix}`, async (params, thunkAPI) => {
-      const onError = (error?: typeof this.config.ErrorHandler | any) => {
-        if (!error || this.queryOption?.isIgnoreError || options?.isIgnoreError) {
-          return thunkAPI.rejectWithValue({});
-        }
+      try {
+        return await cb(params, {...thunkAPI});
+      } catch (error: typeof this.config.ErrorHandler | any) {
         if (!(error instanceof this.config.ErrorHandler)) {
           error = new this.config.ErrorHandler(error);
+        }
+        if (this.queryOption?.isIgnoreError || options?.isIgnoreError) {
+          return thunkAPI.rejectWithValue({} as RejectErrorValue);
         }
         return thunkAPI.rejectWithValue({
           errCode: error.customErrCode,
@@ -302,11 +304,6 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
           contexts: error.contexts,
           errMsg: error.userMsg,
         } as RejectErrorValue);
-      };
-      try {
-        return await cb(params, {...thunkAPI});
-      } catch (e) {
-        return onError(e);
       }
     });
 
@@ -390,7 +387,7 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
         return payload;
       } catch (e) {
         const appErr = new this.config.ErrorHandler(e);
-        if(this.queryOption?.isIgnoreError || options?.isIgnoreError){
+        if (this.queryOption?.isIgnoreError || options?.isIgnoreError) {
           return rejectWithValue({} as RejectErrorValue);
         }
         return rejectWithValue({
@@ -422,7 +419,7 @@ class QueryHelper<ApiItem = undefined, NormalizedResult = undefined> {
           return apiResponseData;
         } catch (e) {
           const appErr = new this.config.ErrorHandler(e);
-          if(this.queryOption?.isIgnoreError || options?.isIgnoreError){
+          if (this.queryOption?.isIgnoreError || options?.isIgnoreError) {
             return rejectWithValue({} as RejectErrorValue);
           }
           return rejectWithValue({
