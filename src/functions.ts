@@ -1,8 +1,8 @@
 import {createSelector, Dictionary, EntityAdapter} from '@reduxjs/toolkit';
-import isArray from 'lodash/isArray'
-import isEqual from 'lodash/isEqual'
-import isPlainObject from 'lodash/isPlainObject'
-import without from 'lodash/without'
+import isArray from 'lodash/isArray';
+import isEqual from 'lodash/isEqual';
+import isPlainObject from 'lodash/isPlainObject';
+import without from 'lodash/without';
 import {NormalizedPayload, ReducerState, SourceReducerState} from './type';
 import {DEFAULT_SOURCE_REDUCER_STATE} from './constants';
 import {ensureSafeChaining, getObjNthItem} from './helpers';
@@ -68,13 +68,19 @@ const addIdsToSources = (state: ReducerState, ids: any[] | number | string, sour
 };
 
 const removeIdsFromSources = (state: ReducerState, ids: any[] | number | string, sources: string[]) => {
+  const remove = (source: string, id: number | string) => {
+    if (state.sources[source].allIds?.indexOf(id) !== -1) {
+      state.sources[source].allIds = state.sources[source].allIds?.filter(i => i !== id);
+    }
+  };
+
   sources.forEach(source => {
     if (ids) {
       ensureSafeChaining(state, ['sources', source, 'allIds'], []);
       if (isArray(ids)) {
-        state.sources[source].allIds = state.sources[source].allIds?.filter(i => ids.indexOf(i) === -1);
+        ids.forEach(id => remove(source, id));
       } else {
-        state.sources[source].allIds = state.sources[source].allIds?.filter(i => i !== ids);
+        remove(source, ids);
       }
     }
   });
