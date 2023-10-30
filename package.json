@@ -20,9 +20,6 @@
     "url": "git+https://github.com/rayyone/redux-thunk-kit.git",
     "type": "git"
   },
-  "engines": {
-    "node": "12 || 14 || 16 || 17"
-  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
