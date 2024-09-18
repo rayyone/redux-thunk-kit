@@ -108,6 +108,7 @@ const createSelectAllBySource = <E, S extends Record<string, any>>(
       [selectEntities, (state: S) => state[subStateName]?.sources[source] || DEFAULT_SOURCE_REDUCER_STATE],
       (entities: Dictionary<E>, {allIds = [], ...rest}: SourceReducerState) => ({
         data: allIds.map((id: string | number) => entities[id]).filter(i => i !== undefined) as E[],
+        allIds,
         ...rest,
       }),
     ),

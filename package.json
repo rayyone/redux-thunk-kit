@@ -1,7 +1,7 @@
 {
   "name": "redux-thunk-kit",
   "description": "This library provide a way to work with normalized data using redux toolkit ",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "Rayyone Ltd.",
   "keywords": [
     "rayyone",
